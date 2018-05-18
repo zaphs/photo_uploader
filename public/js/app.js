@@ -22,10 +22,17 @@ $(document).ready(function(){
 
 	list();
 
-	$('#list').click(list);
+	$('#list').click(function(){
+		message('');
+		list();
+	});
 
 	$('#photo_uploader_form').submit(function(){
 		event.preventDefault();
+
+		if (!$('#photo').val()){
+			return;
+		}
 
 		message('Uploading');
 		$.ajax({
@@ -40,8 +47,12 @@ $(document).ready(function(){
 			message("File uploaded");
 			list();
 			$('#photo').val('');
-		}).fail(function(){
-			message("An error occurred, the file couldn't be uploaded");
+		}).fail(function(error){
+			if (error && error['responseJSON'] && error['responseJSON']['errors']){
+				message(error['responseJSON']['errors']['image']);
+			} else {
+				message("An error occurred, the file couldn't be uploaded");
+			}
 		});
 
 		return false;
